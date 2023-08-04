@@ -1,11 +1,17 @@
-[gd_scene load_steps=4 format=3 uid="uid://bn6oedrotxhrf"]
+[gd_scene load_steps=6 format=3 uid="uid://bn6oedrotxhrf"]
 
 [ext_resource type="Shader" path="res://toon/toon.gdshader" id="1_5cb0g"]
+[ext_resource type="Shader" path="res://toon/outline.gdshader" id="1_qkbva"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_yinrw"]
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_rahdm"]
+render_priority = 1
+shader = ExtResource("1_qkbva")
+
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_1yatj"]
-render_priority = 0
+render_priority = 2
+next_pass = SubResource("ShaderMaterial_rahdm")
 shader = ExtResource("1_5cb0g")
 shader_parameter/base_color = Color(0.341176, 0.584314, 0.72549, 1)
 
