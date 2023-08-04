@@ -5,6 +5,11 @@
 [sub_resource type="SphereMesh" id="SphereMesh_0rajm"]
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_b3obf"]
+noise_type = 4
+fractal_type = 3
+domain_warp_enabled = true
+domain_warp_type = 2
+domain_warp_fractal_type = 2
 
 [sub_resource type="NoiseTexture2D" id="NoiseTexture2D_pa6gs"]
 seamless = true
@@ -14,9 +19,10 @@ noise = SubResource("FastNoiseLite_b3obf")
 render_priority = 0
 shader = ExtResource("1_euitn")
 shader_parameter/base_color = Color(0, 0, 0, 0)
+shader_parameter/edge_color = Color(1, 0, 0, 1)
 shader_parameter/noise_strength = 0.5
-shader_parameter/cutoff_height = 0.0
-shader_parameter/use_time = false
+shader_parameter/cutoff_height = 1.0
+shader_parameter/use_time = true
 shader_parameter/noise_texture = SubResource("NoiseTexture2D_pa6gs")
 
 [node name="World" type="Node3D"]
