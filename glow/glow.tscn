@@ -1,0 +1,185 @@
+[gd_scene load_steps=16 format=3 uid="uid://dngx8mv52js7s"]
+
+[sub_resource type="Shader" id="Shader_0lkc5"]
+code = "shader_type canvas_item;
+
+uniform sampler2D view_prepass;
+uniform sampler2D view_blure;
+uniform sampler2D view_scene;
+uniform float intensity : hint_range(0, 5) = 3;
+
+void fragment() {
+	vec3 prepass = texture(view_prepass, UV).xyz; // prepass
+	vec3 blure = texture(view_blure, UV).xyz; // blurred
+	vec3 col = texture(view_scene, UV).xyz; // col
+	vec3 glow = min(vec3(1,1,1), max(vec3(0,0,0), blure - prepass)*intensity);
+	float luminance = glow.r * 0.299 + glow.g * 0.587 + glow.b * 0.114;
+	vec3 glow_inv = vec3(1.0,1.0,1.0) - vec3(luminance,luminance,luminance);
+	COLOR.xyz = col*glow_inv + glow;
+	
+	//COLOR.xyz = vec3(1.0)-glow ; //col +  vec3(1.0,1.0,1.0) - (blure-prepass)*3.0;//*vec3(1,0,0);
+	//COLOR.xyz = col;
+}"
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_lvmdt"]
+viewport_path = NodePath("BlurYScene")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_xy2e1"]
+viewport_path = NodePath("BlurYScene/BlurY/BlurXScene/BlurX/EmissiveScene")
+
+[sub_resource type="ViewportTexture" id="ViewportTexture_6b6mu"]
+viewport_path = NodePath("BlurYScene/BlurY/BlurXScene/BlurX/EmissiveScene/Emissive/DefaultScene")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0y2iv"]
+resource_local_to_scene = true
+shader = SubResource("Shader_0lkc5")
+shader_parameter/intensity = 3.0
+shader_parameter/view_prepass = SubResource("ViewportTexture_xy2e1")
+shader_parameter/view_blure = SubResource("ViewportTexture_lvmdt")
+shader_parameter/view_scene = SubResource("ViewportTexture_6b6mu")
+
+[sub_resource type="Shader" id="Shader_up701"]
+code = "shader_type canvas_item;
+
+// Blurs the screen in the Y-direction.
+void fragment() {
+    vec3 col = texture(TEXTURE, SCREEN_UV).xyz * 0.16;
+    col += texture(TEXTURE, SCREEN_UV + vec2(0.0, SCREEN_PIXEL_SIZE.y)).xyz * 0.15;
+    col += texture(TEXTURE, SCREEN_UV + vec2(0.0, -SCREEN_PIXEL_SIZE.y)).xyz * 0.15;
+    col += texture(TEXTURE, SCREEN_UV + vec2(0.0, 2.0 * SCREEN_PIXEL_SIZE.y)).xyz * 0.12;
+    col += texture(TEXTURE, SCREEN_UV + vec2(0.0, 2.0 * -SCREEN_PIXEL_SIZE.y)).xyz * 0.12;
+    col += texture(TEXTURE, SCREEN_UV + vec2(0.0, 3.0 * SCREEN_PIXEL_SIZE.y)).xyz * 0.09;
+    col += texture(TEXTURE, SCREEN_UV + vec2(0.0, 3.0 * -SCREEN_PIXEL_SIZE.y)).xyz * 0.09;
+    col += texture(TEXTURE, SCREEN_UV + vec2(0.0, 4.0 * SCREEN_PIXEL_SIZE.y)).xyz * 0.05;
+    col += texture(TEXTURE, SCREEN_UV + vec2(0.0, 4.0 * -SCREEN_PIXEL_SIZE.y)).xyz * 0.05;
+    COLOR.xyz = col;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_nqm2r"]
+shader = SubResource("Shader_up701")
+
+[sub_resource type="Shader" id="Shader_lp2q2"]
+code = "shader_type canvas_item;
+
+// Blurs the screen in the X-direction.
+void fragment() {
+    vec3 col = texture(TEXTURE, SCREEN_UV).xyz * 0.16;
+    col += texture(TEXTURE, SCREEN_UV + vec2(SCREEN_PIXEL_SIZE.x, 0.0)).xyz * 0.15;
+    col += texture(TEXTURE, SCREEN_UV + vec2(-SCREEN_PIXEL_SIZE.x, 0.0)).xyz * 0.15;
+    col += texture(TEXTURE, SCREEN_UV + vec2(2.0 * SCREEN_PIXEL_SIZE.x, 0.0)).xyz * 0.12;
+    col += texture(TEXTURE, SCREEN_UV + vec2(2.0 * -SCREEN_PIXEL_SIZE.x, 0.0)).xyz * 0.12;
+    col += texture(TEXTURE, SCREEN_UV + vec2(3.0 * SCREEN_PIXEL_SIZE.x, 0.0)).xyz * 0.09;
+    col += texture(TEXTURE, SCREEN_UV + vec2(3.0 * -SCREEN_PIXEL_SIZE.x, 0.0)).xyz * 0.09;
+    col += texture(TEXTURE, SCREEN_UV + vec2(4.0 * SCREEN_PIXEL_SIZE.x, 0.0)).xyz * 0.05;
+    col += texture(TEXTURE, SCREEN_UV + vec2(4.0 * -SCREEN_PIXEL_SIZE.x, 0.0)).xyz * 0.05;
+    COLOR.xyz = col;
+}"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_o8oul"]
+shader = SubResource("Shader_lp2q2")
+
+[sub_resource type="GDScript" id="GDScript_w1t31"]
+script/source = "extends SubViewport
+
+@onready var sphere = %Mesh
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	if (false):
+		var glow_material = StandardMaterial3D.new()
+		glow_material.emission_enabled = true
+		glow_material.emission = Color.YELLOW
+		sphere.set_surface_override_material(0, glow_material)
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+func _process(delta):
+	pass
+"
+
+[sub_resource type="Shader" id="Shader_u0rnd"]
+code = "shader_type canvas_item;
+
+uniform sampler2D tex;
+
+void fragment() {
+	COLOR.xyz = texture(TEXTURE, UV).xyz;
+	if (COLOR.xyz != vec3(0)) {
+		COLOR.xyz = vec3(1,0,0);
+	}
+}
+"
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_tmbyw"]
+shader = SubResource("Shader_u0rnd")
+
+[sub_resource type="Environment" id="Environment_udp82"]
+background_mode = 1
+
+[sub_resource type="SphereMesh" id="SphereMesh_skrxw"]
+
+[sub_resource type="ORMMaterial3D" id="ORMMaterial3D_issyq"]
+emission_enabled = true
+emission = Color(1, 1, 1, 1)
+
+[node name="GlowRenderer" type="SubViewportContainer"]
+material = SubResource("ShaderMaterial_0y2iv")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="BlurYScene" type="SubViewport" parent="."]
+handle_input_locally = false
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="BlurY" type="SubViewportContainer" parent="BlurYScene"]
+material = SubResource("ShaderMaterial_nqm2r")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="BlurXScene" type="SubViewport" parent="BlurYScene/BlurY"]
+handle_input_locally = false
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="BlurX" type="SubViewportContainer" parent="BlurYScene/BlurY/BlurXScene"]
+material = SubResource("ShaderMaterial_o8oul")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+stretch = true
+
+[node name="EmissiveScene" type="SubViewport" parent="BlurYScene/BlurY/BlurXScene/BlurX"]
+handle_input_locally = false
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+script = SubResource("GDScript_w1t31")
+
+[node name="Emissive" type="SubViewportContainer" parent="BlurYScene/BlurY/BlurXScene/BlurX/EmissiveScene"]
+material = SubResource("ShaderMaterial_tmbyw")
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="DefaultScene" type="SubViewport" parent="BlurYScene/BlurY/BlurXScene/BlurX/EmissiveScene/Emissive"]
+handle_input_locally = false
+size = Vector2i(1152, 648)
+render_target_update_mode = 4
+
+[node name="Camera3D" type="Camera3D" parent="BlurYScene/BlurY/BlurXScene/BlurX/EmissiveScene/Emissive/DefaultScene"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 2)
+environment = SubResource("Environment_udp82")
+
+[node name="Mesh" type="MeshInstance3D" parent="."]
+unique_name_in_owner = true
+mesh = SubResource("SphereMesh_skrxw")
+surface_material_override/0 = SubResource("ORMMaterial3D_issyq")
