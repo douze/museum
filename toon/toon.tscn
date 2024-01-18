@@ -1,26 +1,18 @@
-[gd_scene load_steps=6 format=3 uid="uid://bn6oedrotxhrf"]
+[gd_scene load_steps=3 format=3 uid="uid://bn6oedrotxhrf"]
 
-[ext_resource type="Shader" path="res://toon/toon.gdshader" id="1_5cb0g"]
-[ext_resource type="Shader" path="res://toon/outline.gdshader" id="1_qkbva"]
+[ext_resource type="Material" uid="uid://15ksmyg3ogbv" path="res://toon/toon.tres" id="1_reaop"]
 
-[sub_resource type="SphereMesh" id="SphereMesh_yinrw"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_rahdm"]
-render_priority = 1
-shader = ExtResource("1_qkbva")
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_1yatj"]
-render_priority = 2
-next_pass = SubResource("ShaderMaterial_rahdm")
-shader = ExtResource("1_5cb0g")
-shader_parameter/base_color = Color(0.341176, 0.584314, 0.72549, 1)
+[sub_resource type="SphereMesh" id="SphereMesh_eexw1"]
 
 [node name="World" type="Node3D"]
 
 [node name="Sphere" type="MeshInstance3D" parent="."]
-mesh = SubResource("SphereMesh_yinrw")
-surface_material_override/0 = SubResource("ShaderMaterial_1yatj")
+mesh = SubResource("SphereMesh_eexw1")
+surface_material_override/0 = ExtResource("1_reaop")
 
 [node name="SpotLight" type="SpotLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 0.866025, 0.5, 0, -0.5, 0.866025, 0, 1, 2)
-light_energy = 0.5
+transform = Transform3D(1, 0, 0, 0, 0.965926, 0.258819, 0, -0.258819, 0.965926, 0, 1, 2)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5)
+visible = false

@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode ambient_light_disabled;
+//render_mode ambient_light_disabled;
 
 uniform vec4 base_color : source_color;
 
@@ -23,5 +23,5 @@ void light() {
 	float rim = (1.0 - n_dot_v) * pow(n_dot_l, 0.1);
 	rim = smoothstep(rim_amount - 0.01, rim_amount + 0.01, rim);
 	
-	DIFFUSE_LIGHT = ALBEDO * ATTENUATION *  ((diffuse + specular + rim) * LIGHT_COLOR);
+	DIFFUSE_LIGHT = ALBEDO * ATTENUATION * 0.3 *  ((diffuse + specular + rim) * LIGHT_COLOR);
 }
